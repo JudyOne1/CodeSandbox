@@ -16,15 +16,14 @@ import java.util.List;
 public class ProcessUtils {
 
     /**
-     * 执行进程并获取信息
-     *
+     * 执行进程并获取信息(args)
+     * leetcode 模式
      * @param runProcess
      * @param opName
      * @return
      */
     public static ExecuteMessage runProcessAndGetMessage(Process runProcess, String opName) {
         ExecuteMessage executeMessage = new ExecuteMessage();
-
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -67,6 +66,7 @@ public class ProcessUtils {
                 }
                 executeMessage.setErrorMessage(StringUtils.join(errorOutputStrList, '\n'));
             }
+
             stopWatch.stop();
             executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
         } catch (Exception e) {
@@ -76,7 +76,7 @@ public class ProcessUtils {
     }
 
     /**
-     * 执行交互式进程并获取信息
+     * 执行交互式进程并获取信息(scanner)
      *
      * @param runProcess
      * @param args
@@ -89,6 +89,7 @@ public class ProcessUtils {
             // 向控制台输入程序
             OutputStream outputStream = runProcess.getOutputStream();
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+            //todo 完善acm模式的输入
             String[] s = args.split(" ");
             String join = StrUtil.join("\n", s) + "\n";
             outputStreamWriter.write(join);
