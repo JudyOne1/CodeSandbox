@@ -6,6 +6,7 @@ import com.judy.codesandbox.model.ExecuteCodeRequest;
 import com.judy.codesandbox.model.ExecuteCodeResponse;
 import com.judy.codesandbox.model.ExecuteMessage;
 import com.judy.codesandbox.model.JudgeInfo;
+import com.judy.codesandbox.security.DefaultSecurityManager;
 import com.judy.codesandbox.utils.ProcessUtils;
 
 import java.io.BufferedReader;
@@ -24,10 +25,12 @@ import java.util.UUID;
 public class JavaNativeCodeSandbox implements CodeSandbox {
     public static final String GLOBAL_CODE_DIR_NAME = "tempCode";
     public static final String JAVA_CLASS_NAME = "Main.java";
+    public static final long TIME_OUT = 5000l;
 
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
+//        System.setSecurityManager(new DefaultSecurityManager());
         String code = executeCodeRequest.getCode();
 //        String language = executeCodeRequest.getLanguage();
         List<String> inputList = executeCodeRequest.getInputList();
@@ -44,6 +47,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
         String userCodePath = userCodePathName + File.separator + JAVA_CLASS_NAME;
         //1.保存为文件
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
+        //文件父路径
         String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
         System.out.println("CodePathName: " + CodePathName);
         System.out.println("userCodePathName" + userCodePathName);
@@ -67,6 +71,16 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
             String runCMD = String.format("java -Dfile.encoding=UTF-8 -cp %s Main %s", userCodePathName, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCMD);
+                //超时控制
+                new Thread(()->{
+                    try {
+                        Thread.sleep(TIME_OUT);
+                        runProcess.destroy();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
+
                 ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "执行");
                 executeMessageList.add(executeMessage);
                 System.out.println(executeMessage);
@@ -80,7 +94,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<String> outputList = new ArrayList<>();
         // 取用时最大值，便于判断是否超时
-        //todo 扩展为每个用例都记录时间和内存
+        // todo 扩展为每个用例都记录时间和内存
         long maxTime = 0;
         for (ExecuteMessage executeMessage : executeMessageList) {
             String errorMessage = executeMessage.getErrorMessage();
