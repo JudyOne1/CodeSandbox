@@ -10,6 +10,6 @@ import com.judy.codesandbox.model.ExecuteCodeResponse;
  */
 public interface CodeSandbox {
 
-    ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest);
+    ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) throws InterruptedException;
 
 }
