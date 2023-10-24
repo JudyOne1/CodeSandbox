@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController("/")
 public class MainController {
 
-    // 定义鉴权请求头和密钥
+    // 定义鉴权请求头和密钥 保证安全性
     private static final String AUTH_REQUEST_HEADER = "auth";
 
     private static final String AUTH_REQUEST_SECRET = "secretKey";
@@ -48,6 +48,7 @@ public class MainController {
         if (executeCodeRequest == null) {
             throw new RuntimeException("请求参数为空");
         }
-        return javaNativeCodeSandbox.executeCode(executeCodeRequest);
+        ExecuteCodeResponse executeCodeResponse = javaNativeCodeSandbox.executeCode(executeCodeRequest);
+        return executeCodeResponse;
     }
 }

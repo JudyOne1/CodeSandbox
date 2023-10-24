@@ -27,7 +27,7 @@ public class ExecuteCodeResponse {
     /**
      * 输出结果
      */
-    private List<String> OutputList;
+    private List<String> outputList;
     /**
      * 执行信息
      */

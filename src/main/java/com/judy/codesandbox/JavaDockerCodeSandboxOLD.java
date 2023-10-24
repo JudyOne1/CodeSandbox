@@ -35,10 +35,6 @@ public class JavaDockerCodeSandboxOLD implements CodeSandbox {
 
     private static final long TIME_OUT = 5000L;
 
-    private static final String SECURITY_MANAGER_PATH = "C:\\code\\yuoj-code-sandbox\\src\\main\\resources\\security";
-
-    private static final String SECURITY_MANAGER_CLASS_NAME = "MySecurityManager";
-
     public static final Boolean first_init = true;
 
     public static void main(String[] args) {

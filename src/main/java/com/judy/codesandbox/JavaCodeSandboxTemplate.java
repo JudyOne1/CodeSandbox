@@ -41,7 +41,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile);
         System.out.println(compileFileExecuteMessage);
 
-        // 3. 执行代码，得到输出结果
+        //3. 执行代码，得到输出结果
         List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList);
 
         //4. 收集整理输出结果
@@ -52,6 +52,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
         }
+        System.out.println(outputResponse);
         return outputResponse;
     }
 
