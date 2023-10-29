@@ -24,9 +24,11 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
+    private static final String GLOBAL_JAVA_CLASS_NAME = "Main.class";
 
     private static final long TIME_OUT = 5000L;
+
+    private static final int ERROR_EXECUTE = 3;
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
@@ -66,7 +68,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
     public File saveCodeToFile(String code) {
         String userDir = System.getProperty("user.dir");
         String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
-        // 判断全局代码目录是否存在，没有则新建
+        // 判断全局代码目录是否存在，没有则新建目录
         if (!FileUtil.exist(globalCodePathName)) {
             FileUtil.mkdir(globalCodePathName);
         }
@@ -75,6 +77,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
         String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
+        //todo 增加input.txt文件
         return userCodeFile;
     }
 
@@ -90,11 +93,12 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             Process compileProcess = Runtime.getRuntime().exec(compileCmd);
             ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
             if (executeMessage.getExitValue() != 0) {
+                //todo 编译错误后的异常处理
                 throw new RuntimeException("编译错误");
             }
             return executeMessage;
         } catch (Exception e) {
-//            return getErrorResponse(e);
+            //      return getErrorResponse(e);
             throw new RuntimeException(e);
         }
     }
@@ -112,6 +116,9 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
 // String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);安全管理器
+            //todo 修改命令
+
+            //todo class Solution 怎么解决？
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
@@ -119,7 +126,6 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                 new Thread(() -> {
                     try {
                         Thread.sleep(TIME_OUT);
-                        System.out.println("超时了，中断");
                         runProcess.destroy();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -127,6 +133,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                 }).start();
                 ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行");
                 System.out.println(executeMessage);
+                System.out.println("--------------运行完了--------------");
                 executeMessageList.add(executeMessage);
             } catch (Exception e) {
                 throw new RuntimeException("执行错误", e);
@@ -151,7 +158,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             if (StrUtil.isNotBlank(errorMessage)) {
                 executeCodeResponse.setMessage(errorMessage);
                 // 用户提交的代码执行中存在错误
-                executeCodeResponse.setStatus(3);
+                executeCodeResponse.setStatus(ERROR_EXECUTE);
                 break;
             }
             outputList.add(executeMessage.getMessage());

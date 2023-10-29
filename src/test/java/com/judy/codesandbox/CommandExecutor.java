@@ -10,11 +10,13 @@ import java.util.List;
 public class CommandExecutor {
     public static void main(String[] args) {
         try {
+            //在同一个目录下新建一个input.txt文件
+            //数据库查询用例，写到txt文件中
+            //多个用例则覆盖写入
             // 要执行的命令
-            String command = "ping www.baidu.com";
-            
+            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main", "G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode");
             // 使用Runtime.getRuntime().exec()执行命令
-            Process runProcess = Runtime.getRuntime().exec(command);
+            Process runProcess = Runtime.getRuntime().exec(runCmd);
             
             // 等待程序执行，获取错误码
             int exitValue = runProcess.waitFor();
@@ -28,6 +30,7 @@ public class CommandExecutor {
                 String compileOutputLine;
                 while ((compileOutputLine = bufferedReader.readLine()) != null) {
                     outputStrList.add(compileOutputLine);
+                    System.out.println(compileOutputLine);
                 }
             } else {
                 // 异常退出
