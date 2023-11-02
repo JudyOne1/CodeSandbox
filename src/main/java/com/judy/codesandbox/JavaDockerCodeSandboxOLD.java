@@ -31,7 +31,7 @@ public class JavaDockerCodeSandboxOLD implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_JAVA_CLASS_NAME = "Main.class";
+    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Main.class";
 
     private static final long TIME_OUT = 5000L;
 
@@ -41,9 +41,9 @@ public class JavaDockerCodeSandboxOLD implements CodeSandbox {
         JavaNativeCodeSandbox javaNativeCodeSandbox = new JavaNativeCodeSandbox();
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3"));
-//        String code = ResourceUtil.readStr("testCode/simpleComputeArgs/Main.class", StandardCharsets.UTF_8);
+//        String code = ResourceUtil.readStr("testCode/simpleComputeArgs/com.judy.tempCode.Main.class", StandardCharsets.UTF_8);
         String code = ResourceUtil.readStr("testCode/unsafeCode/RunFileError.java", StandardCharsets.UTF_8);
-//        String code = ResourceUtil.readStr("testCode/simpleCompute/Main.class", StandardCharsets.UTF_8);
+//        String code = ResourceUtil.readStr("testCode/simpleCompute/com.judy.tempCode.Main.class", StandardCharsets.UTF_8);
         executeCodeRequest.setCode(code);
         executeCodeRequest.setLanguage("java");
         ExecuteCodeResponse executeCodeResponse = javaNativeCodeSandbox.executeCode(executeCodeRequest);
@@ -128,9 +128,9 @@ public class JavaDockerCodeSandboxOLD implements CodeSandbox {
         ArrayList<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
             StopWatch stopWatch = new StopWatch();
-            //创建命令 docker exec containtId java -cp /app Main 1 2
+            //创建命令 docker exec containtId java -cp /app com.judy.tempCode.Main 1 2
             String[] inputArgsArray = inputArgs.split(" ");
-            String[] cmdArray = ArrayUtil.append(new String[]{"java", "-cp", "/app", "Main"}, inputArgsArray);
+            String[] cmdArray = ArrayUtil.append(new String[]{"java", "-cp", "/app", "com.judy.tempCode.Main"}, inputArgsArray);
             ExecCreateCmdResponse execCreateCmdResponse = dockerClient
                     .execCreateCmd(containerId)
                     .withCmd(cmdArray)

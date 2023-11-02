@@ -87,13 +87,13 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
         // 启动容器
         dockerClient.startContainerCmd(containerId).exec();
 
-        // docker exec keen_blackwell java -cp /app Main 1 3
+        // docker exec keen_blackwell java -cp /app com.judy.tempCode.Main 1 3
         // 执行命令并获取结果
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
             StopWatch stopWatch = new StopWatch();
             String[] inputArgsArray = inputArgs.split(" ");
-            String[] cmdArray = ArrayUtil.append(new String[]{"java", "-cp", "/app", "Main"}, inputArgsArray);
+            String[] cmdArray = ArrayUtil.append(new String[]{"java", "-cp", "/app", "com.judy.tempCode.Main"}, inputArgsArray);
             ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
                     .withCmd(cmdArray)
                     .withAttachStderr(true)

@@ -1,63 +1,53 @@
-package com.judy.codesandbox;
+package com.judy;
 
-import cn.hutool.json.JSONConfig;
-import cn.hutool.json.JSONUtil;
-
-import com.judy.codesandbox.model.ParamsInfo;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+//@Slf4j
+class Solution{
+    public static void main(String[] args){
 
-@SpringBootTest
-@Slf4j
-class IDEATests {
+        //输入参数：gifts = [5,1,4,null,null,3,6], k = 4
+        String input = "gifts = [5,1,4,3,6], k = 10";
+        //核心代码模式测试 -> 使用args传入字符串参数
 
-
-
-    @Test
-    void contextLoads() {
-//        String piecesStr = "[5,1,null,4,3,3,6]";
-        String json = "[[88,18],[null],[6,66]]";
-/*
-        int[][] pieces = parseStringTo2Array(piecesStr);
-        int[] pieces = parseStringTo1Array(piecesStr);
-        System.out.println("pieces: " + Arrays.deepToString(pieces));
-        String json = "[5,1,4,null,null,3,6]";
-        System.out.println("array "+ Arrays.deepToString(array));
-*/
-
+        //获取参数名、参数类型、参数值 gifts 和 k
+        ArrayList<String> params = getParams(input);
+        //获取目标方法的参数信息
+//        Parameter[] ParameterInfos = reflectMethod("solute", params);
+//        if (ParameterInfos == null) {
+//            throw new RuntimeException("出现未知错误");
+//        }
+//        if (params.size() != ParameterInfos.length) {
+//            throw new RuntimeException("系统出现未知错误");
+//        }
+//-------------------------------------------------------------
+        int[] gifts;
+        int k;
+        int i = 0;
+        gifts = JAVAparseStringTo1ArrayNoNull(params.get(i++));
+        k = Integer.parseInt(params.get(i));
+        System.out.println(solute(gifts, k));
+//--------------------------------------------------------------
     }
-
-/*    //将[[88],[15]]转换为二维数组
-    public static Integer[][] parseStringTo2Array(String json) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Integer.class, new NullValueHandlingTypeAdapter()).create();
-        Integer[][] array = gson.fromJson(json, Integer[][].class);
-        return array;
+    public static int solute(int[] gifts, int k) {
+        // 用户编写的代码
+        System.out.println(Arrays.toString(gifts));
+        System.out.println(k);
+        return 10086;
     }
+//下面是自己编写的getParams()方法、reflectMethod()方法、JAVAparseStringTo1ArrayNoNull()方法
 
-    //将[5,1,4,null,null,3,6]转换为一维数组
-    public static Integer[] parseStringTo1Array(String json) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Integer.class, new NullValueHandlingTypeAdapter()).create();
-        Integer[] array = gson.fromJson(json, Integer[].class);
-        return array;
-    }*/
+    /**
+     * 获取参数名、参数类型、参数值 如gifts 和 k
+     * @param input 输入字符串
+     * @return 封装成类，此类相当于定义一个参数
+     */
+    public static ArrayList<String> getParams(String input)  {
+//        JSONConfig jsonConfig = new JSONConfig();
+//        jsonConfig.setIgnoreNullValue(false);
 
-
-    public static ArrayList<ParamsInfo> getParams(String input) throws JSONException {
-        JSONConfig jsonConfig = new JSONConfig();
-        jsonConfig.setIgnoreNullValue(false);
-//        HashMap<String, String> map = new HashMap<>();
-
-        ArrayList<ParamsInfo> paramsInfos = new ArrayList<>();
+        ArrayList<String> paramsInfos = new ArrayList<>();
         //分割成多段
         String[] totalSplit = input.split(", ");
 
@@ -77,7 +67,7 @@ class IDEATests {
                 if (i2 != -1 && i1 != -1) {
                     //是数组
                     String arr = stringBuilder.substring(i1, i2 + 1).toString();
-                    log.info("arr: " + arr);
+//                    log.info("arr: " + arr);
                     //再去取，看看是不是二维数组
                     stringBuilder = new StringBuilder(arr);
                     i1 = stringBuilder.indexOf("[");
@@ -87,19 +77,19 @@ class IDEATests {
                     stringBuilder = new StringBuilder(subArr);
                     i1 = stringBuilder.indexOf("[");
                     i2 = stringBuilder.lastIndexOf("]");
-                    log.info("subArr: " + subArr);
+//                    log.info("subArr: " + subArr);
                     if (i2 != -1 && i1 != -1) {
-                        log.error("arr: " + arr);
+//                        log.error("arr: " + arr);
                         //arr是二维数组
                         int[][] arr2 = JAVAparseStringTo2ArrayNoNull(arr);
-                        ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr2, jsonConfig), arr2.getClass());
-                        paramsInfos.add(paramsInfo);
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr2, jsonConfig), arr2.getClass());
+                        paramsInfos.add(Arrays.deepToString(arr2));
                     } else {
-                        log.error("arr: " + arr);
+//                        log.error("arr: " + arr);
                         //arr是一维数组
                         int[] arr1 = JAVAparseStringTo1ArrayNoNull(arr);
-                        ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr1, jsonConfig), arr1.getClass());
-                        paramsInfos.add(paramsInfo);
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr1, jsonConfig), arr1.getClass());
+                        paramsInfos.add(Arrays.toString(arr1));
                     }
                 } else {
                     //不是数组 取值
@@ -110,12 +100,12 @@ class IDEATests {
                     if (i2 == -1 && i1 == -1) {
                         //不是字符串 强转成int
                         Integer valueInt = Integer.parseInt(value);
-                        ParamsInfo paramsInfo = new ParamsInfo(name, valueInt.toString(), valueInt.getClass());
-                        paramsInfos.add(paramsInfo);
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, valueInt.toString(), valueInt.getClass());
+                        paramsInfos.add(String.valueOf(valueInt));
                     } else {
                         //是字符串
-                        ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
-                        paramsInfos.add(paramsInfo);
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                        paramsInfos.add(value);
                     }
                 }
             }
@@ -140,13 +130,13 @@ class IDEATests {
                 if (i2 != -1 && i1 != -1) {
                     //arr是二维数组
                     int[][] arr2 = JAVAparseStringTo2ArrayNoNull(arr);
-                    ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr2, jsonConfig), arr2.getClass());
-                    paramsInfos.add(paramsInfo);
+//                    ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr2, jsonConfig), arr2.getClass());
+                    paramsInfos.add(Arrays.deepToString(arr2));
                 } else {
                     //arr是一维数组
                     int[] arr1 = JAVAparseStringTo1ArrayNoNull(arr);
-                    ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr1, jsonConfig), arr1.getClass());
-                    paramsInfos.add(paramsInfo);
+//                    ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(arr1, jsonConfig), arr1.getClass());
+                    paramsInfos.add(Arrays.toString(arr1));
                 }
             } else {
                 //不是数组 取值
@@ -157,18 +147,22 @@ class IDEATests {
                 if (i2 == -1 && i1 == -1) {
                     //不是字符串 强转成int
                     Integer valueInt = Integer.parseInt(value);
-                    ParamsInfo paramsInfo = new ParamsInfo(name, JSONUtil.toJsonStr(valueInt, jsonConfig), valueInt.getClass());
-                    paramsInfos.add(paramsInfo);
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, valueInt.toString(), valueInt.getClass());
+                    paramsInfos.add(String.valueOf(valueInt));
+                } else {
+                    //是字符串
+//                        ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                    paramsInfos.add(value);
                 }
             }
         }
         return paramsInfos;
     }
 
-    public static Parameter[] reflectMethod(String methodName, ArrayList<ParamsInfo> params) {
+/*    public static Parameter[] reflectMethod(String methodName, ArrayList<ParamsInfo> params) {*//*
         try {
             // 获取目标类的Class对象
-            Class<?> targetClass = IDEATests.class;
+            Class<?> targetClass = Solution.class;
 
             // 获取目标方法的Method对象
             Class<?>[] parameterTypes = new Class<?>[params.size()];
@@ -199,71 +193,18 @@ class IDEATests {
             e.printStackTrace();
         }
         return null;
-    }
-
-
-
-
-    public static void main(String[] args) throws JSONException {
-
-        //输入参数：gifts = [5,1,4,null,null,3,6], k = 4
-        String input = "gifts = [5,1,4,3,6], k = 10";
-        //核心代码模式测试  使用args传入字符串参数
-
-        //获取参数名、参数类型、参数值 gifts 和 k
-        ArrayList<ParamsInfo> params = getParams(input);
-        //获取目标方法的参数信息
-        Parameter[] ParameterInfos = reflectMethod("solute", params);
-        if (ParameterInfos == null) {
-            throw new RuntimeException("出现未知错误");
-        }
-        if (params.size() != ParameterInfos.length) {
-            throw new RuntimeException("系统出现未知错误");
-        }
-//-------------------------------------------------------------
-        int[] gifts;
-        int k;
-        int i = 0;
-        gifts = JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue());
-        k = Integer.parseInt(params.get(i).getValue());
-        System.out.println(solute(gifts, k));
-//--------------------------------------------------------------
-    }
-    public static int solute(int[] gifts, int k) {
-        // 用户编写的代码
-        return 10086;
-    }
-
-
-
-/*    //将[[88],[15]]转换为二维数组
-    public static int[][] parseStringTo2ArrayNoNull(String json) {
-        log.warn("parseStringTo2Array: " + json);
-        Gson gson = new Gson();
-        Type type = new TypeToken<int[][]>() {
-        }.getType();
-        return gson.fromJson(json, type);
-    }
-
-    //将[5,1,4,null,null,3,6]转换为一维数组
-    public static int[] parseStringTo1ArrayNoNull(String json) {
-        log.warn("parseStringTo1Array: " + json);
-        Gson gson = new Gson();
-        Type type = new TypeToken<int[]>() {
-        }.getType();
-        return gson.fromJson(json, type);
     }*/
 
-    public static int[] JAVAparseStringTo1ArrayNoNull(String json) throws JSONException {
-        JSONArray jsonArray = new JSONArray(json);
-        int[] result = new int[jsonArray.length()];
-        for (int i = 0; i < jsonArray.length(); i++) {
-            result[i] = jsonArray.getInt(i);
-        }
-        return result;
+/*public static int[] parseStringTo1ArrayNoNull(String json) throws JSONException {
+    JSONArray jsonArray = new JSONArray(json);
+    int[] result = new int[jsonArray.length()];
+    for (int i = 0; i < jsonArray.length(); i++) {
+        result[i] = jsonArray.getInt(i);
     }
+    return result;
+}
 
-    public static int[][] JAVAparseStringTo2ArrayNoNull(String json) throws JSONException {
+    public static int[][] parseStringTo2ArrayNoNull(String json) throws JSONException {
         JSONArray jsonArray = new JSONArray(json);
         int[][] result = new int[jsonArray.length()][];
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -275,7 +216,42 @@ class IDEATests {
             result[i] = innerResult;
         }
         return result;
+    }*/
+
+    public static int[] JAVAparseStringTo1ArrayNoNull(String json) {
+        // 将json字符串转换为数组元素字符串
+        String[] arrStr = json.replace("[", "").replace("]", "").split(",");
+
+        // 创建一个int数组来存储转换后的整数
+        int[] arrInt = new int[arrStr.length];
+
+        // 将数组元素字符串转换为int类型
+        for (int i = 0; i < arrStr.length; i++) {
+            arrInt[i] = Integer.parseInt(arrStr[i].trim());
+        }
+
+        return arrInt;
     }
+
+    public static int[][] JAVAparseStringTo2ArrayNoNull(String json) {
+        // 将json字符串转换为二维数组元素字符串
+        String[] arrStr1 = json.replace("[[", "").replace("]]", "").split("\\],\\[");
+
+        // 创建一个二维int数组来存储转换后的整数
+        int[][] arrInt = new int[arrStr1.length][];
+
+        // 将数组元素字符串转换为int类型
+        for (int i = 0; i < arrStr1.length; i++) {
+            String[] arrStr2 = arrStr1[i].split(",");
+            arrInt[i] = new int[arrStr2.length];
+            for (int j = 0; j < arrStr2.length; j++) {
+                arrInt[i][j] = Integer.parseInt(arrStr2[j].trim());
+            }
+        }
+
+        return arrInt;
+    }
+
 
 
 }

@@ -11,5 +11,4 @@ public class MyParameter {
     private String name;
     private Class<?> type;
     private Object value;
-
 }
