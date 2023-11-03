@@ -25,7 +25,7 @@ public class JavaNativeCodeSandboxOLD implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Main.class";
+    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
 
     private static final long TIME_OUT = 5000L;
 
@@ -47,9 +47,9 @@ public class JavaNativeCodeSandboxOLD implements CodeSandbox {
         JavaNativeCodeSandboxOLD javaNativeCodeSandbox = new JavaNativeCodeSandboxOLD();
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3"));
-//        String code = ResourceUtil.readStr("testCode/simpleComputeArgs/com.judy.tempCode.Main.class", StandardCharsets.UTF_8);
+//        String code = ResourceUtil.readStr("testCode/simpleComputeArgs/com.judy.tempCode.Solution.class", StandardCharsets.UTF_8);
         String code = ResourceUtil.readStr("testCode/unsafeCode/RunFileError.java", StandardCharsets.UTF_8);
-//        String code = ResourceUtil.readStr("testCode/simpleCompute/com.judy.tempCode.Main.class", StandardCharsets.UTF_8);
+//        String code = ResourceUtil.readStr("testCode/simpleCompute/com.judy.tempCode.Solution.class", StandardCharsets.UTF_8);
         executeCodeRequest.setCode(code);
         executeCodeRequest.setLanguage("java");
         ExecuteCodeResponse executeCodeResponse = javaNativeCodeSandbox.executeCode(executeCodeRequest);
@@ -98,8 +98,8 @@ public class JavaNativeCodeSandboxOLD implements CodeSandbox {
         // 3. 执行代码，得到输出结果
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
-//            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Main %s", userCodeParentPath, inputArgs);
-            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s;%s -Djava.security.manager=%s com.judy.tempCode.Main %s", userCodeParentPath, SECURITY_MANAGER_PATH, SECURITY_MANAGER_CLASS_NAME, inputArgs);
+//            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);
+            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s;%s -Djava.security.manager=%s com.judy.tempCode.Solution %s", userCodeParentPath, SECURITY_MANAGER_PATH, SECURITY_MANAGER_CLASS_NAME, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
                 // 超时控制

@@ -1,35 +1,40 @@
 package com.judy;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 //@Slf4j
-class Solution{
-    public static void main(String[] args){
+class Solution {
+    public static void main(String[] args) {
 
         //输入参数：gifts = [5,1,4,null,null,3,6], k = 4
         String input = "gifts = [5,1,4,3,6], k = 10";
         //核心代码模式测试 -> 使用args传入字符串参数
 
         //获取参数名、参数类型、参数值 gifts 和 k
-        ArrayList<String> params = getParams(input);
+//        ArrayList<String> params = getParams(input);
+
+        ArrayList<ParamsInfo> params = getParamsByClass(input);
         //获取目标方法的参数信息
-//        Parameter[] ParameterInfos = reflectMethod("solute", params);
-//        if (ParameterInfos == null) {
-//            throw new RuntimeException("出现未知错误");
-//        }
-//        if (params.size() != ParameterInfos.length) {
-//            throw new RuntimeException("系统出现未知错误");
-//        }
+        Parameter[] ParameterInfos = reflectMethod("solute", params);
+        if (ParameterInfos == null) {
+            throw new RuntimeException("出现未知错误");
+        }
+        if (params.size() != ParameterInfos.length) {
+            throw new RuntimeException("系统出现未知错误");
+        }
 //-------------------------------------------------------------
-        int[] gifts;
-        int k;
+//        int[] gifts;
+//        int k;
         int i = 0;
-        gifts = JAVAparseStringTo1ArrayNoNull(params.get(i++));
-        k = Integer.parseInt(params.get(i));
-        System.out.println(solute(gifts, k));
+//        gifts = JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue());
+//        k = Integer.parseInt(params.get(i).getValue());
+        System.out.println(solute(JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue()), Integer.parseInt(params.get(i).getValue())));
 //--------------------------------------------------------------
     }
+
     public static int solute(int[] gifts, int k) {
         // 用户编写的代码
         System.out.println(Arrays.toString(gifts));
@@ -38,14 +43,49 @@ class Solution{
     }
 //下面是自己编写的getParams()方法、reflectMethod()方法、JAVAparseStringTo1ArrayNoNull()方法
 
+    static class ParamsInfo {
+        String name;
+        String value;
+        Class className;
+
+        public ParamsInfo(String name, String value, Class className) {
+            this.name = name;
+            this.value = value;
+            this.className = className;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public Class getClassName() {
+            return className;
+        }
+
+        public void setClassName(Class className) {
+            this.className = className;
+        }
+    }
+
     /**
      * 获取参数名、参数类型、参数值 如gifts 和 k
+     *
      * @param input 输入字符串
      * @return 封装成类，此类相当于定义一个参数
      */
-    public static ArrayList<String> getParams(String input)  {
-//        JSONConfig jsonConfig = new JSONConfig();
-//        jsonConfig.setIgnoreNullValue(false);
+    public static ArrayList<String> getParams(String input) {
 
         ArrayList<String> paramsInfos = new ArrayList<>();
         //分割成多段
@@ -159,7 +199,7 @@ class Solution{
         return paramsInfos;
     }
 
-/*    public static Parameter[] reflectMethod(String methodName, ArrayList<ParamsInfo> params) {*//*
+    public static Parameter[] reflectMethod(String methodName, ArrayList<ParamsInfo> params) {
         try {
             // 获取目标类的Class对象
             Class<?> targetClass = Solution.class;
@@ -183,17 +223,12 @@ class Solution{
             // 获取目标方法的参数
             Parameter[] parameters = targetMethod.getParameters();
 
-            // 输出参数信息
-            for (Parameter parameter : parameters) {
-                System.out.println("参数名：" + parameter.getName());
-                System.out.println("参数类型：" + parameter.getType());
-            }
             return parameters;
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;
-    }*/
+    }
 
 /*public static int[] parseStringTo1ArrayNoNull(String json) throws JSONException {
     JSONArray jsonArray = new JSONArray(json);
@@ -252,6 +287,127 @@ class Solution{
         return arrInt;
     }
 
+    /**
+     * 获取参数名、参数类型、参数值 如gifts 和 k
+     *
+     * @param input 输入字符串
+     * @return 封装成类，此类相当于定义一个参数
+     */
+    public static ArrayList<ParamsInfo> getParamsByClass(String input) {
+
+        ArrayList<ParamsInfo> paramsInfos = new ArrayList<>();
+        //分割成多段
+        String[] totalSplit = input.split(", ");
+
+        //有多个
+        if (totalSplit.length > 0) {
+            for (int i = 0; i < totalSplit.length; i++) {
+                //获取参数名 name
+                String name;
+                String[] subSplit = totalSplit[i].split(" = ");
+                name = subSplit[0];
+                //传参只有一个值
+                //取数组字符串
+                StringBuilder stringBuilder = new StringBuilder(subSplit[1]);
+                int i1 = stringBuilder.indexOf("[");
+                int i2 = stringBuilder.lastIndexOf("]");
+
+                if (i2 != -1 && i1 != -1) {
+                    //是数组
+                    String arr = stringBuilder.substring(i1, i2 + 1).toString();
+//                    log.info("arr: " + arr);
+                    //再去取，看看是不是二维数组
+                    stringBuilder = new StringBuilder(arr);
+                    i1 = stringBuilder.indexOf("[");
+                    i2 = stringBuilder.lastIndexOf("]");
+                    //剔除最外围的圈 [ ]
+                    String subArr = stringBuilder.substring(1, arr.length() - 1).toString();
+                    stringBuilder = new StringBuilder(subArr);
+                    i1 = stringBuilder.indexOf("[");
+                    i2 = stringBuilder.lastIndexOf("]");
+//                    log.info("subArr: " + subArr);
+                    if (i2 != -1 && i1 != -1) {
+//                        log.error("arr: " + arr);
+                        //arr是二维数组
+                        int[][] arr2 = JAVAparseStringTo2ArrayNoNull(arr);
+                        ParamsInfo paramsInfo = new ParamsInfo(name, Arrays.deepToString(arr2), arr2.getClass());
+                        paramsInfos.add(paramsInfo);
+                    } else {
+//                        log.error("arr: " + arr);
+                        //arr是一维数组
+                        int[] arr1 = JAVAparseStringTo1ArrayNoNull(arr);
+                        ParamsInfo paramsInfo = new ParamsInfo(name, Arrays.toString(arr1), arr1.getClass());
+                        paramsInfos.add(paramsInfo);
+                    }
+                } else {
+                    //不是数组 取值
+                    String value = subSplit[1];
+                    stringBuilder = new StringBuilder(input);
+                    i1 = stringBuilder.indexOf("\"");
+                    i2 = stringBuilder.lastIndexOf("\"");
+                    if (i2 == -1 && i1 == -1) {
+                        //不是字符串 强转成int
+                        Integer valueInt = Integer.parseInt(value);
+                        ParamsInfo paramsInfo = new ParamsInfo(name, valueInt.toString(), valueInt.getClass());
+                        paramsInfos.add(paramsInfo);
+                    } else {
+                        //是字符串
+                        ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                        paramsInfos.add(paramsInfo);
+                    }
+                }
+            }
+        } else {
+            //获取参数名 name
+            String name;
+            String[] nameSplit = input.split(" = ");
+            name = nameSplit[0];
+            //传参只有一个值
+            //取数组字符串
+            StringBuilder stringBuilder = new StringBuilder(input);
+            int i1 = stringBuilder.indexOf("[");
+            int i2 = stringBuilder.lastIndexOf("]");
+
+            if (i2 != -1 && i1 != -1) {
+                //是数组
+                String arr = stringBuilder.substring(i1, i2 + 1).toString();
+                //再去取，看看是不是二维数组
+                stringBuilder = new StringBuilder(input);
+                i1 = stringBuilder.indexOf("[");
+                i2 = stringBuilder.lastIndexOf("]");
+                if (i2 != -1 && i1 != -1) {
+//                        log.error("arr: " + arr);
+                    //arr是二维数组
+                    int[][] arr2 = JAVAparseStringTo2ArrayNoNull(arr);
+                    ParamsInfo paramsInfo = new ParamsInfo(name, Arrays.deepToString(arr2), arr2.getClass());
+                    paramsInfos.add(paramsInfo);
+                } else {
+//                        log.error("arr: " + arr);
+                    //arr是一维数组
+                    int[] arr1 = JAVAparseStringTo1ArrayNoNull(arr);
+                    ParamsInfo paramsInfo = new ParamsInfo(name, Arrays.toString(arr1), arr1.getClass());
+                    paramsInfos.add(paramsInfo);
+                }
+            } else {
+                //不是数组 取值
+                String value = nameSplit[1];
+                stringBuilder = new StringBuilder(input);
+                i1 = stringBuilder.indexOf("\"");
+                i2 = stringBuilder.lastIndexOf("\"");
+                if (i2 == -1 && i1 == -1) {
+                    //不是字符串 强转成int
+                    Integer valueInt = Integer.parseInt(value);
+                    ParamsInfo paramsInfo = new ParamsInfo(name, valueInt.toString(), valueInt.getClass());
+                    paramsInfos.add(paramsInfo);
+                } else {
+                    //是字符串
+                    ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                    paramsInfos.add(paramsInfo);
+                }
+            }
+        }
+        return paramsInfos;
+    }
 
 
 }

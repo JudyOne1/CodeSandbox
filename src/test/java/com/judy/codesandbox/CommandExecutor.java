@@ -14,7 +14,7 @@ public class CommandExecutor {
             //数据库查询用例，写到txt文件中
             //多个用例则覆盖写入
             // 要执行的命令
-            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Main", "G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode");
+            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution", "G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode");
             // 使用Runtime.getRuntime().exec()执行命令
             Process runProcess = Runtime.getRuntime().exec(runCmd);
             

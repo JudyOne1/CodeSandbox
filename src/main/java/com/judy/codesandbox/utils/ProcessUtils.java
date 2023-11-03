@@ -17,9 +17,8 @@ public class ProcessUtils {
 
     /**
      * 执行进程并获取信息(args)
-     * leetcode 模式
      *
-     * @param runProcess
+     * @param runProcess 传入的进程不同，功能可以不同
      * @param opName
      * @return
      */
@@ -78,6 +77,7 @@ public class ProcessUtils {
 
     /**
      * 执行交互式进程并获取信息(scanner)
+     * ACM模式
      *
      * @param runProcess
      * @param args

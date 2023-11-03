@@ -24,7 +24,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Main.class";
+    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
 
     private static final long TIME_OUT = 5000L;
 
@@ -77,7 +77,6 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
         String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
-        //todo 增加input.txt文件
         return userCodeFile;
     }
 
@@ -115,11 +114,11 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
-// String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Main %s", userCodeParentPath, inputArgs);安全管理器
+// String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);安全管理器
             //todo 修改命令
 
             //todo class Solution 怎么解决？
-            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Main %s", userCodeParentPath, inputArgs);
+            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
                 // 超时控制
