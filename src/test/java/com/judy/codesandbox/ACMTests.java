@@ -1,11 +1,10 @@
 package com.judy.codesandbox;
 
-import cn.hutool.core.util.StrUtil;
-import com.judy.codesandbox.model.ExecuteMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.*;
+
 
 /**
  * @author Judy
@@ -21,14 +20,70 @@ public class ACMTests {
      */
 
     public static void main(String[] args) throws IOException {
-        String userCodeParentPath = "G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode";
+        ExecuteMessage executeMessage = runACMJudge("G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode", "A man, a plan, a canal: Panama");
+        System.out.println(executeMessage.getMessage());
+
+    }
+
+    public static ExecuteMessage runACMJudge(String userCodeParentPath, String inputStr) throws IOException {
 
         String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main", userCodeParentPath);
         Process runProcess = Runtime.getRuntime().exec(runCmd);
-        String inputStr = "A man, a plan, a canal: Panama";
-//        System.out.println(inputStr);
         ExecuteMessage executeMessage = runInteractProcessAndGetMessage(runProcess, inputStr);
-        System.out.println(executeMessage);
+        return executeMessage;
+    }
+
+    static class ExecuteMessage {
+
+        private Integer exitValue;
+
+        private String message;
+
+        private String errorMessage;
+
+        private Long time;
+
+        private Long memory;
+
+        public Integer getExitValue() {
+            return exitValue;
+        }
+
+        public void setExitValue(Integer exitValue) {
+            this.exitValue = exitValue;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public void setErrorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+        }
+
+        public Long getTime() {
+            return time;
+        }
+
+        public void setTime(Long time) {
+            this.time = time;
+        }
+
+        public Long getMemory() {
+            return memory;
+        }
+
+        public void setMemory(Long memory) {
+            this.memory = memory;
+        }
     }
 
 
