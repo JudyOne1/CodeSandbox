@@ -22,7 +22,6 @@ public class ACMTests {
     public static void main(String[] args) throws IOException {
         ExecuteMessage executeMessage = runACMJudge("G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode", "A man, a plan, a canal: Panama");
         System.out.println(executeMessage.getMessage());
-
     }
 
     public static ExecuteMessage runACMJudge(String userCodeParentPath, String inputStr) throws IOException {

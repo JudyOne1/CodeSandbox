@@ -24,7 +24,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
+    private static final String GLOBAL_ACM_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
+    private static final String GLOBAL_CCM_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
 
     private static final long TIME_OUT = 5000L;
 
@@ -35,6 +36,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         List<String> inputList = executeCodeRequest.getInputList();
         String code = executeCodeRequest.getCode();
         String language = executeCodeRequest.getLanguage();
+        Integer modeSelect = executeCodeRequest.getModeSelect();
 
         //1. 把用户的代码保存为文件
         File userCodeFile = saveCodeToFile(code);
@@ -44,7 +46,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         System.out.println(compileFileExecuteMessage);
 
         //3. 执行代码，得到输出结果
-        List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList);
+        List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList,modeSelect);
 
         //4. 收集整理输出结果
         ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
@@ -75,7 +77,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         // 把用户的代码隔离存放
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
-        String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
+        String userCodePath = userCodeParentPath + File.separator + GLOBAL_ACM_JAVA_CLASS_NAME;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
         return userCodeFile;
     }
@@ -109,16 +111,19 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
      * @param inputList
      * @return
      */
-    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList) {
+    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList, Integer modeSelect) {
         String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
 
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
 // String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);安全管理器
-            //todo 修改命令
+            String runCmd;
+            if (modeSelect == 1){
+                runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
+            }else {
+                runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution %s", userCodeParentPath, inputArgs);
+            }
 
-            //todo class Solution 怎么解决？
-            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
                 // 超时控制
@@ -130,7 +135,13 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                         throw new RuntimeException(e);
                     }
                 }).start();
-                ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行");
+                ExecuteMessage executeMessage = null;
+                if (modeSelect == 1){
+                    executeMessage = ProcessUtils.runInteractProcessAndGetMessage(runProcess, "运行ACMmode");
+                }else {
+                    executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行ACMmode");
+                }
+
                 System.out.println(executeMessage);
                 System.out.println("--------------运行完了--------------");
                 executeMessageList.add(executeMessage);

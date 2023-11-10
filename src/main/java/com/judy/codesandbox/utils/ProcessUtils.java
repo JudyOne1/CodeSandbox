@@ -91,9 +91,14 @@ public class ProcessUtils {
             OutputStream outputStream = runProcess.getOutputStream();
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
             //todo 完善acm模式的输入
-            String[] s = args.split(" ");
+            /*String[] s = args.split(" ");
             String join = StrUtil.join("\n", s) + "\n";
             outputStreamWriter.write(join);
+            outputStreamWriter.flush();*/
+
+            //String[] s = args.split(" ");
+            //String join = StrUtil.join("\n", s) + "\n";
+            outputStreamWriter.write(args+"\n");
             // 相当于按了回车，执行输入的发送
             outputStreamWriter.flush();
 

@@ -19,4 +19,8 @@ public class ExecuteCodeRequest {
     private String code;
     private String language;
     private List<String> inputList;
+    /**
+     * 选择的题目模式 1-ACM | 2-CCM | 4-counter
+     */
+    private Integer modeSelect;
 }
