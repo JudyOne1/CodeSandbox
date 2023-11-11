@@ -10,7 +10,7 @@ class Solution {
     public static void main(String[] args) {
 
         //输入参数：gifts = [5,1,4,null,null,3,6], k = 4
-        String input = "gifts = [5,1,4,3,6], k = 10";
+        String input = args[0];
         //核心代码模式测试 -> 使用args传入字符串参数
 
         //获取参数名、参数类型、参数值 gifts 和 k

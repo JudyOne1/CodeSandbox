@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.*;
+import com.sun.management.OperatingSystemMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 
 
 /**
@@ -20,8 +23,44 @@ public class ACMTests {
      */
 
     public static void main(String[] args) throws IOException {
-        ExecuteMessage executeMessage = runACMJudge("G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode", "A man, a plan, a canal: Panama");
+        String input = "10 5\n" +
+                "1 2 3 6 7 9 11 22 44 50";
+        ExecuteMessage executeMessage = runACMJudge("G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode", input);
         System.out.println(executeMessage.getMessage());
+        double runtimeMemerary = getRuntimeMemerary();
+        System.out.println(runtimeMemerary+"KB");
+    }
+
+    public static double getRuntimeMemerary(){
+//        // 获取当前Java虚拟机的运行时对象
+//        Runtime runtime = Runtime.getRuntime();
+//
+//        // 获取Java程序运行时占用的最大内存（以字节为单位）
+//        long maxMemory = runtime.maxMemory();
+//
+//        // 将最大内存转换为合适的单位（例如KB、MB或GB）
+//        double maxMemoryInKB = maxMemory / 1024.0;
+//
+//        // 打印结果
+//        System.out.println("Java程序运行时占用的最大内存为：");
+//        return maxMemoryInKB;
+        // 获取 Java 虚拟机的运行时
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+
+        // 获取操作系统的管理器
+        OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+
+        // 获取当前进程的 PID
+        String processName = runtime.getName();
+        String pid = processName.split("@")[0];
+
+        // 获取该进程的 CPU 占用和内存占用
+        double cpuUsage = os.getProcessCpuLoad();
+        long memoryUsage = os.getTotalPhysicalMemorySize()-os.getFreePhysicalMemorySize();
+
+        System.out.println("CPU 占用率: " + cpuUsage);
+        System.out.println("内存占用: " + memoryUsage);
+        return memoryUsage;
     }
 
     public static ExecuteMessage runACMJudge(String userCodeParentPath, String inputStr) throws IOException {
@@ -32,7 +71,7 @@ public class ACMTests {
         return executeMessage;
     }
 
-    static class ExecuteMessage {
+    final static class ExecuteMessage {
 
         private Integer exitValue;
 
@@ -44,13 +83,6 @@ public class ACMTests {
 
         private Long memory;
 
-        public Integer getExitValue() {
-            return exitValue;
-        }
-
-        public void setExitValue(Integer exitValue) {
-            this.exitValue = exitValue;
-        }
 
         public String getMessage() {
             return message;
@@ -60,29 +92,10 @@ public class ACMTests {
             this.message = message;
         }
 
-        public String getErrorMessage() {
-            return errorMessage;
-        }
-
         public void setErrorMessage(String errorMessage) {
             this.errorMessage = errorMessage;
         }
 
-        public Long getTime() {
-            return time;
-        }
-
-        public void setTime(Long time) {
-            this.time = time;
-        }
-
-        public Long getMemory() {
-            return memory;
-        }
-
-        public void setMemory(Long memory) {
-            this.memory = memory;
-        }
     }
 
 

@@ -24,8 +24,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
 
-    private static final String GLOBAL_ACM_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
-    private static final String GLOBAL_CCM_JAVA_CLASS_NAME = "com.judy.tempCode.Solution.class";
+    private static final String GLOBAL_ACM_JAVA_CLASS_NAME = "Main.java";
+    private static final String GLOBAL_CCM_JAVA_CLASS_NAME = "Solution.java";
 
     private static final long TIME_OUT = 5000L;
 
@@ -39,17 +39,17 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         Integer modeSelect = executeCodeRequest.getModeSelect();
 
         //1. 把用户的代码保存为文件
-        File userCodeFile = saveCodeToFile(code);
+        File userCodeFile = saveCodeToFile(code, modeSelect);
 
         //2. 编译代码，得到 class 文件
         ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile);
         System.out.println(compileFileExecuteMessage);
 
         //3. 执行代码，得到输出结果
-        List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList,modeSelect);
+        List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList, modeSelect);
 
         //4. 收集整理输出结果
-        ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
+        ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList, modeSelect);
 
         //5. 文件清理
         boolean b = deleteFile(userCodeFile);
@@ -67,7 +67,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
      * @param code 用户代码
      * @return
      */
-    public File saveCodeToFile(String code) {
+    public File saveCodeToFile(String code, Integer modeSelect) {
         String userDir = System.getProperty("user.dir");
         String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
         // 判断全局代码目录是否存在，没有则新建目录
@@ -77,7 +77,13 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         // 把用户的代码隔离存放
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
-        String userCodePath = userCodeParentPath + File.separator + GLOBAL_ACM_JAVA_CLASS_NAME;
+        String userCodePath;
+        if (modeSelect == 1) {
+            userCodePath = userCodeParentPath + File.separator + GLOBAL_ACM_JAVA_CLASS_NAME;
+        } else {
+            userCodePath = userCodeParentPath + File.separator + GLOBAL_CCM_JAVA_CLASS_NAME;
+        }
+
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
         return userCodeFile;
     }
@@ -95,6 +101,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
             if (executeMessage.getExitValue() != 0) {
                 //todo 编译错误后的异常处理
+                //正确返回的errorMessage是什么？
                 throw new RuntimeException("编译错误");
             }
             return executeMessage;
@@ -115,15 +122,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
 
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
-        for (String inputArgs : inputList) {
-// String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);安全管理器
-            String runCmd;
-            if (modeSelect == 1){
-                runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
-            }else {
-                runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution %s", userCodeParentPath, inputArgs);
-            }
-
+        if (inputList == null || inputList.isEmpty()) {
+            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution", userCodeParentPath);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
                 // 超时控制
@@ -136,11 +136,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                     }
                 }).start();
                 ExecuteMessage executeMessage = null;
-                if (modeSelect == 1){
-                    executeMessage = ProcessUtils.runInteractProcessAndGetMessage(runProcess, "运行ACMmode");
-                }else {
-                    executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行ACMmode");
-                }
+                executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行CCMmode/CMmode");
+
 
                 System.out.println(executeMessage);
                 System.out.println("--------------运行完了--------------");
@@ -148,7 +145,43 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             } catch (Exception e) {
                 throw new RuntimeException("执行错误", e);
             }
+        } else {
+            for (String inputArgs : inputList) {
+// String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);安全管理器
+                String runCmd;
+                if (modeSelect == 1) {
+                    runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
+                } else {
+                    runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution %s", userCodeParentPath, inputArgs);
+                }
+
+                try {
+                    Process runProcess = Runtime.getRuntime().exec(runCmd);
+                    // 超时控制
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(TIME_OUT);
+                            runProcess.destroy();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
+                    ExecuteMessage executeMessage = null;
+                    if (modeSelect == 1) {
+                        executeMessage = ProcessUtils.runInteractProcessAndGetMessage(runProcess, "运行ACMmode");
+                    } else {
+                        executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行CCMmode/CMmode");
+                    }
+
+                    System.out.println(executeMessage);
+                    System.out.println("--------------运行完了--------------");
+                    executeMessageList.add(executeMessage);
+                } catch (Exception e) {
+                    throw new RuntimeException("执行错误", e);
+                }
+            }
         }
+
         return executeMessageList;
     }
 
@@ -158,7 +191,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
      * @param executeMessageList
      * @return
      */
-    public ExecuteCodeResponse getOutputResponse(List<ExecuteMessage> executeMessageList) {
+    public ExecuteCodeResponse getOutputResponse(List<ExecuteMessage> executeMessageList, Integer modeSelect) {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<String> outputList = new ArrayList<>();
         // 取用时最大值，便于判断是否超时

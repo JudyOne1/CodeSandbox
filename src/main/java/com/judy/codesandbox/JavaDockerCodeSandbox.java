@@ -35,7 +35,7 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
      * @return
      */
     @Override
-    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList) {
+    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList,Integer modeSelect) {
         String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
         // 获取默认的 Docker Client
         DockerClient dockerClient = DockerClientBuilder.getInstance().build();
