@@ -27,6 +27,8 @@ class IDEATests {
     void contextLoads() {
 //        String piecesStr = "[5,1,null,4,3,3,6]";
         String json = "[[88,18],[null],[6,66]]";
+        System.out.println(9);
+        System.out.println(9);
 /*
         int[][] pieces = parseStringTo2Array(piecesStr);
         int[] pieces = parseStringTo1Array(piecesStr);

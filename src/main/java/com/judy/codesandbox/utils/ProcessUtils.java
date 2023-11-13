@@ -90,15 +90,11 @@ public class ProcessUtils {
             // 向控制台输入程序
             OutputStream outputStream = runProcess.getOutputStream();
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-            //todo 完善acm模式的输入
-            /*String[] s = args.split(" ");
+
+            //TODO 完善acm模式输入
+            String[] s = args.split(" ");
             String join = StrUtil.join("\n", s) + "\n";
             outputStreamWriter.write(join);
-            outputStreamWriter.flush();*/
-
-            //String[] s = args.split(" ");
-            //String join = StrUtil.join("\n", s) + "\n";
-            outputStreamWriter.write(args+"\n");
             // 相当于按了回车，执行输入的发送
             outputStreamWriter.flush();
 
@@ -118,6 +114,7 @@ public class ProcessUtils {
             inputStream.close();
             runProcess.destroy();
         } catch (Exception e) {
+            executeMessage.setErrorMessage("ERROR!!!");
             e.printStackTrace();
         }
         return executeMessage;

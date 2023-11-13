@@ -95,6 +95,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
      * @return
      */
     public ExecuteMessage compileFile(File userCodeFile) {
+        System.out.println(userCodeFile.getAbsolutePath());
         String compileCmd = String.format("javac -encoding utf-8 %s", userCodeFile.getAbsolutePath());
         try {
             Process compileProcess = Runtime.getRuntime().exec(compileCmd);
@@ -123,6 +124,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         if (inputList == null || inputList.isEmpty()) {
+            //一般是cm模式
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution", userCodeParentPath);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
@@ -147,10 +149,10 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             }
         } else {
             for (String inputArgs : inputList) {
-// String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s com.judy.tempCode.Solution %s", userCodeParentPath, inputArgs);安全管理器
+                System.out.println(inputArgs);
                 String runCmd;
                 if (modeSelect == 1) {
-                    runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
+                    runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main", userCodeParentPath);
                 } else {
                     runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Solution %s", userCodeParentPath, inputArgs);
                 }
@@ -168,7 +170,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                     }).start();
                     ExecuteMessage executeMessage = null;
                     if (modeSelect == 1) {
-                        executeMessage = ProcessUtils.runInteractProcessAndGetMessage(runProcess, "运行ACMmode");
+                        //inputArgs参数由这里传入
+                        executeMessage = ProcessUtils.runInteractProcessAndGetMessage(runProcess, inputArgs);
                     } else {
                         executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行CCMmode/CMmode");
                     }
@@ -217,8 +220,6 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         executeCodeResponse.setOutputList(outputList);
         JudgeInfo judgeInfo = new JudgeInfo();
         judgeInfo.setTime(maxTime);
-        // 要借助第三方库来获取内存占用，非常麻烦，此处不做实现
-        // judgeInfo.setMemory();
         executeCodeResponse.setJudgeInfo(judgeInfo);
         return executeCodeResponse;
     }

@@ -1,5 +1,6 @@
 package com.judy.codesandbox;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -23,12 +24,12 @@ public class ACMTests {
      */
 
     public static void main(String[] args) throws IOException {
-        String input = "10 5\n" +
-                "1 2 3 6 7 9 11 22 44 50";
+        String input = "10 5\n1 2 3 6 7 9 11 22 44 50";
+        input = "10 5 1 2 3 6 7 9 11 22 44 50";
         ExecuteMessage executeMessage = runACMJudge("G:\\MyDocuments\\1知识星球\\OJ\\code-sandbox\\tmpCode", input);
         System.out.println(executeMessage.getMessage());
-        double runtimeMemerary = getRuntimeMemerary();
-        System.out.println(runtimeMemerary+"KB");
+//        double runtimeMemerary = getRuntimeMemerary();
+//        System.out.println(runtimeMemerary+"KB");
     }
 
     public static double getRuntimeMemerary(){
@@ -116,9 +117,9 @@ public class ACMTests {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
             //TODO ACM模式输入功能完善
 
-//            String[] s = args.split(" ");
-//            String join = StrUtil.join("\n", s) + "\n";
-            outputStreamWriter.write(args+"\n");
+            String[] s = args.split(" ");
+            String join = StrUtil.join("\n", s) + "\n";
+            outputStreamWriter.write(join);
             // 相当于按了回车，执行输入的发送
             outputStreamWriter.flush();
 

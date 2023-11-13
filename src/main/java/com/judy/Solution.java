@@ -7,10 +7,49 @@ import java.util.Arrays;
 
 //@Slf4j
 class Solution {
+
+    public static int longestCommonSubsequence(String text1, String text2) {
+        char[] charArray1 = text1.toCharArray();
+        char[] charArray2 = text2.toCharArray();
+        int N = charArray1.length;
+        int M = charArray2.length;
+        int[][] dp = new int[N][M];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (i == 0 && j == 0) {
+                    dp[i][j] = charArray1[i] == charArray2[j] ? 1 : 0;
+                } else if (i == 0) {
+                    dp[i][j] = charArray1[i] == charArray2[j] ? 1 : dp[i][j-1];
+                } else if (j == 0) {
+                    dp[i][j] = charArray1[i] == charArray2[j] ? 1 : dp[i-1][j];
+                } else {
+                    int p1 = dp[i][j-1];
+                    int p2 = dp[i-1][j];
+                    int p3 = charArray1[i] == charArray2[j] ? 1 + dp[i-1][j-1] : 0;
+                    dp[i][j] = Math.max(Math.max(p1, p2), p3);
+                }
+            }
+        }
+        return dp[N-1][M-1];
+    }
+
+    public static int[] twoSum(int[] nums, int target) {
+        int n = nums.length;
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                if (nums[i] + nums[j] == target) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        return new int[0];
+    }
+
     public static void main(String[] args) {
 
         //输入参数：gifts = [5,1,4,null,null,3,6], k = 4
         String input = args[0];
+
         //核心代码模式测试 -> 使用args传入字符串参数
 
         //获取参数名、参数类型、参数值 gifts 和 k
@@ -18,20 +57,27 @@ class Solution {
 
         ArrayList<ParamsInfo> params = getParamsByClass(input);
         //获取目标方法的参数信息
-        Parameter[] ParameterInfos = reflectMethod("solute", params);
-        if (ParameterInfos == null) {
-            throw new RuntimeException("出现未知错误");
-        }
-        if (params.size() != ParameterInfos.length) {
-            throw new RuntimeException("系统出现未知错误");
-        }
+//        Parameter[] ParameterInfos = reflectMethod("solute", params);
+//        if (ParameterInfos == null) {
+//            throw new RuntimeException("出现未知错误");
+//        }
+//        if (params.size() != ParameterInfos.length) {
+//            throw new RuntimeException("系统出现未知错误");
+//        }
 //-------------------------------------------------------------
 //        int[] gifts;
 //        int k;
         int i = 0;
 //        gifts = JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue());
 //        k = Integer.parseInt(params.get(i).getValue());
-        System.out.println(solute(JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue()), Integer.parseInt(params.get(i).getValue())));
+
+        int[] ans = twoSum(JAVAparseStringTo1ArrayNoNull(params.get(i++).getValue()), Integer.parseInt(params.get(i).getValue()));
+        String str = Arrays.toString(ans);
+        System.out.println(str.replace(" ",""));
+
+//        System.out.println(longestCommonSubsequence(params.get(i++).getValue(),params.get(i).getValue()));
+
+//        System.out.println(longestCommonSubsequence("abcde","ace"));
 //--------------------------------------------------------------
     }
 
@@ -297,14 +343,14 @@ class Solution {
 
         ArrayList<ParamsInfo> paramsInfos = new ArrayList<>();
         //分割成多段
-        String[] totalSplit = input.split(", ");
+        String[] totalSplit = input.split(",(?=[^\\]]*$)");
 
         //有多个
         if (totalSplit.length > 0) {
             for (int i = 0; i < totalSplit.length; i++) {
                 //获取参数名 name
                 String name;
-                String[] subSplit = totalSplit[i].split(" = ");
+                String[] subSplit = totalSplit[i].split("=");
                 name = subSplit[0];
                 //传参只有一个值
                 //取数组字符串
@@ -352,7 +398,9 @@ class Solution {
                         paramsInfos.add(paramsInfo);
                     } else {
                         //是字符串
-                        ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                        //todo 字符串两边的双引号需要删去
+                        String valueWithoutQuotes = value.replaceAll("^\"|\"$", "");
+                        ParamsInfo paramsInfo = new ParamsInfo(name, valueWithoutQuotes, value.getClass());
                         paramsInfos.add(paramsInfo);
                     }
                 }
@@ -360,7 +408,7 @@ class Solution {
         } else {
             //获取参数名 name
             String name;
-            String[] nameSplit = input.split(" = ");
+            String[] nameSplit = input.split("=");
             name = nameSplit[0];
             //传参只有一个值
             //取数组字符串
@@ -401,7 +449,8 @@ class Solution {
                     paramsInfos.add(paramsInfo);
                 } else {
                     //是字符串
-                    ParamsInfo paramsInfo = new ParamsInfo(name, value, value.getClass());
+                    String valueWithoutQuotes = value.replaceAll("^\"|\"$", "");
+                    ParamsInfo paramsInfo = new ParamsInfo(name, valueWithoutQuotes, value.getClass());
                     paramsInfos.add(paramsInfo);
                 }
             }
