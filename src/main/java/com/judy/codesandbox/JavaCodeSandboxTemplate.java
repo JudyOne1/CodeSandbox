@@ -10,6 +10,7 @@ import com.judy.codesandbox.utils.ProcessUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,14 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         //2. 编译代码，得到 class 文件
         ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile);
+        if (compileFileExecuteMessage.getExitValue() != 0) {
+            ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+            executeCodeResponse.setMessage("编译错误");
+            executeCodeResponse.setStatus(0);
+            executeCodeResponse.setOutputList(null);
+            executeCodeResponse.setJudgeInfo(null);
+            return executeCodeResponse;
+        }
         System.out.println(compileFileExecuteMessage);
 
         //3. 执行代码，得到输出结果
@@ -56,7 +65,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
         }
-        System.out.println(outputResponse);
+//        System.out.println(outputResponse);
         return outputResponse;
     }
 
@@ -103,7 +112,10 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             if (executeMessage.getExitValue() != 0) {
                 //todo 编译错误后的异常处理
                 //正确返回的errorMessage是什么？
-                throw new RuntimeException("编译错误");
+                executeMessage.setMessage("编译错误");
+                executeMessage.setErrorMessage("编译错误");
+                return executeMessage;
+//                throw new RuntimeException("编译错误");
             }
             return executeMessage;
         } catch (Exception e) {
